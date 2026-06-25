@@ -1,0 +1,9 @@
+/* Minimal reset — keep native form widget chrome (we WANT dated browser defaults) */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; padding: 0; }
+body { overflow: hidden; }
+h1, h2, h3, h4, h5, h6, p, ul, ol, dl, dd, figure { margin: 0; }
+ul, ol { padding-left: 0; list-style: none; }
+a { color: inherit; }
+button { font-family: inherit; }
+table { border-collapse: collapse; }
