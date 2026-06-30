@@ -20,10 +20,13 @@ import {
   AllergiesTab, HealthMaintenanceTab, DemographicsTab, CoverageTab, LettersTab,
   MediaTab, AuditTab,
 } from './modules/chart/MoreTabs';
+import TendApp from './tend/TendApp';
 
 export default function App() {
   return (
     <Routes>
+      {/* The new AI-native EHR ("Tend") — its own full-screen surface, no HeliosChart shell */}
+      <Route path="/tend" element={<TendApp />} />
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/schedule" replace />} />
         <Route path="schedule" element={<ScheduleScreen />} />
