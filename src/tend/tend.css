@@ -138,20 +138,20 @@
 .t-plan-item { position: relative; padding-left: 16px; }
 .t-plan-item::before { content: ""; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); }
 .t-term { font-weight: 700; }
+/* calmer: a quiet guideline note, not a highlighted block */
 .t-callout {
-  margin-top: 8px; background: var(--violet-soft);
-  border-left: 3px solid var(--violet); border-radius: 6px;
-  padding: 9px 12px; color: var(--ink-2); font-size: 13px;
+  margin-top: 5px; padding-left: 11px;
+  border-left: 2px solid var(--border);
+  color: var(--ink-3); font-size: 12.5px; font-style: italic;
 }
-.t-callout b { color: var(--violet-2); }
 .t-med { padding-left: 16px; position: relative; }
 .t-med::before { content: ""; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); }
-.t-med .mn { color: var(--violet); font-weight: 600; }
+.t-med .mn { color: var(--ink); font-weight: 600; }
 .t-med .md { color: var(--ink-2); }
 
 /* ---------- Right panel ---------- */
 .t-right {
-  width: 372px; flex-shrink: 0;
+  width: 468px; flex-shrink: 0;
   border-left: 1px solid var(--border);
   background: var(--cream);
   display: flex; flex-direction: column;
@@ -171,6 +171,44 @@
 .t-action.off .lbl { color: var(--ink-3); text-decoration: line-through; }
 .tend-app .t-check { width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid #cfcdd6; background: #fff; display: grid; place-items: center; flex-shrink: 0; color: transparent; }
 .t-check.on { background: var(--violet); border-color: var(--violet); color: #fff; }
+/* ---- automation workspace cards ---- */
+.t-ws-group { color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; margin: 18px 0 8px; }
+.t-acard { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; margin-bottom: 10px; }
+.t-acard.excluded { opacity: 0.5; }
+.t-acard-h { display: flex; align-items: center; gap: 10px; }
+.t-acard-h .ic { color: var(--violet); display: inline-flex; }
+.t-acard-h .ttl { font-weight: 600; flex: 1; }
+.t-acard-sub { color: var(--ink-2); font-size: 13px; margin-top: 2px; }
+
+/* small toggle to include/exclude an action */
+.tend-app .t-toggle { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #cfcdd6; background: #fff; display: grid; place-items: center; color: transparent; flex-shrink: 0; }
+.tend-app .t-toggle.on { background: var(--violet); border-color: var(--violet); color: #fff; }
+
+/* med controls */
+.t-med-row { display: flex; flex-direction: column; gap: 9px; margin-top: 11px; }
+.tend-app .t-seg { display: inline-flex; background: #f1f0ec; border-radius: 9px; padding: 3px; gap: 2px; }
+.tend-app .t-seg button { padding: 5px 11px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.tend-app .t-seg button.on { background: #fff; color: var(--violet-2); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+.tend-app .t-seg button.on.danger { color: #c0392b; }
+.t-fieldrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.t-field { display: flex; flex-direction: column; gap: 3px; }
+.t-field label { font-size: 11px; color: var(--ink-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.tend-app .t-input, .tend-app .t-select {
+  border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; background: #fff;
+  font-size: 13px; color: var(--ink);
+}
+.tend-app .t-input { width: 70px; }
+.tend-app .t-input:focus, .tend-app .t-select:focus { outline: none; border-color: var(--violet); }
+.tend-app .t-addmed { display: inline-flex; align-items: center; gap: 6px; color: var(--violet); font-weight: 600; font-size: 13px; margin-top: 4px; }
+.tend-app .t-addmed:hover { color: var(--violet-2); }
+
+/* trace line */
+.t-trace { display: flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: 12px; margin-top: 9px; }
+.t-trace.done { color: var(--green-fg); }
+.t-trace .bar { width: 2px; align-self: stretch; }
+
+.t-acard-body { display: flex; align-items: flex-start; gap: 11px; }
+
 .t-right-foot { padding: 16px 22px; border-top: 1px solid var(--border); }
 .tend-app .t-signbtn {
   width: 100%; background: var(--violet); color: #fff; font-weight: 600; font-size: 15px;

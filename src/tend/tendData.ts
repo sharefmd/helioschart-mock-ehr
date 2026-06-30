@@ -20,39 +20,55 @@ export const VISIT_REASONS = [
 export const VISIT_TYPES = ['Office visit', 'Telehealth visit', 'Nurse visit'];
 
 export const VISIT_SUMMARY =
-  '32-year-old with an ASC-US / HPV-positive Pap — the decision today is colposcopy versus repeat testing. ' +
-  'Contraception is stable (refill due) and a small simple ovarian cyst just needs a surveillance ultrasound.';
+  '32-year-old with an ASC-US / HPV-positive Pap. The main decision today is colposcopy versus repeat testing. ' +
+  'Contraception is stable (refill due, some breakthrough spotting), and a small simple ovarian cyst likely just ' +
+  'needs surveillance.';
 
-export interface PlanItem { term: string; text: string; callout?: { label: string; body: string } }
+export interface PlanItem { term: string; text: string; note?: string }
 
+// Note reads as "what to think through / ask today," not a finalized directive.
 export const NOTE = {
   title: 'Office visit',
   byline: 'Dr. Alanna Reyes · Jun 25, 2026',
   interval:
-    '32-year-old with an ASC-US / HPV-positive Pap — the decision today is colposcopy versus repeat testing. ' +
-    'Contraception is stable (refill due) and a small simple ovarian cyst just needs a surveillance ultrasound.',
-  exam: 'Focused exam performed today; pertinent findings reviewed and reflected in the assessment & plan below.',
+    'Returns for abnormal Pap follow-up. ASC-US with positive high-risk HPV. Reports mild breakthrough spotting ' +
+    'on her current pill; otherwise well. No pelvic pain.',
+  exam: 'Focused exam performed today; pertinent findings reflected below.',
+  planTitle: 'What to think through today',
   plan: [
     {
-      term: 'Cytology',
-      text: '— Recommended and scheduled colposcopy; counseled on HPV.',
-      callout: {
-        label: 'ASCCP risk-based guidance:',
-        body: 'ASC-US with positive high-risk HPV generally meets the threshold for colposcopy.',
-      },
+      term: 'Abnormal Pap (ASC-US, HPV+)',
+      text: '— Colposcopy vs. repeat cytology? Risk-based guidance leans toward colposcopy; worth deciding today.',
+      note: 'ASCCP: ASC-US with positive high-risk HPV generally meets the threshold for colposcopy.',
     },
-    { term: 'Contraception', text: '— Continued OCP; refilled; reassured on spotting.' },
-    { term: 'Ovarian cyst', text: '— Ordered a repeat pelvic ultrasound.' },
+    { term: 'Contraception', text: '— Refill is due and she reports some spotting. Continue the current OCP, or adjust?' },
+    { term: 'Simple ovarian cyst', text: '— Small and simple; surveillance ultrasound is the usual next step.' },
   ] as PlanItem[],
   medications: [
-    { name: 'Combined OCP (norethindrone/EE) 1 mg', detail: '/20 mcg · 1 tablet po daily · for Contraception' },
+    { name: 'Combined OCP (norethindrone/EE) 1 mg / 20 mcg', detail: '1 tablet PO daily · for Contraception' },
   ],
 };
 
-export type ActionIcon = 'doc' | 'calendar';
-export interface SignAction { id: string; group: string; label: string; icon: ActionIcon; checked: boolean }
+// ---- Automation workspace (right panel) ----
+export const PHARMACIES = ['Walgreens #4821 — 220 Main St', 'CVS #1180 — 45 Oak Ave', 'Mail order — OptumRx'];
 
-export const SIGN_ACTIONS: SignAction[] = [
-  { id: 'plan', group: 'UPDATES TO THE CHART', label: "Update today's plan", icon: 'doc', checked: true },
-  { id: 'followup', group: 'FOLLOW-UPS FREEDA WILL QUEUE', label: 'Book a follow-up', icon: 'calendar', checked: true },
+export const MED_SEED = {
+  id: 'ocp',
+  name: 'Combined OCP (norethindrone/EE 1 mg / 20 mcg)',
+  sig: '1 tab PO daily',
+  refills: 3,
+};
+
+export interface OrderAction {
+  id: string; title: string; detail: string; trace: string; done: string; included: boolean;
+}
+
+export const ORDER_SEED: OrderAction[] = [
+  { id: 'colpo', title: 'Schedule colposcopy', detail: 'Gyn procedure · per ASCCP risk-based guidance', trace: 'Routes to procedure scheduling', done: 'Colposcopy requested — scheduling will reach out to book', included: true },
+  { id: 'us', title: 'Order pelvic ultrasound', detail: 'Surveillance for simple ovarian cyst', trace: 'Routes to imaging', done: 'Ultrasound order placed — imaging will schedule', included: true },
 ];
+
+export const FOLLOWUP_SEED = {
+  id: 'fu', title: 'Book follow-up', detail: '2 weeks · review colposcopy plan & results',
+  trace: 'Routes to scheduling', done: 'Follow-up task created (2 weeks)', included: true,
+};
