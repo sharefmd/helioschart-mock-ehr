@@ -36,6 +36,10 @@ export const NOTE = {
     'on her current pill; otherwise well. No pelvic pain.',
   exam: 'To be documented during the visit.',
   planTitle: 'What to think through today',
+  previousAnpDate: 'last visit · Jun 25, 2025',
+  previousAnp:
+    'Annual well-woman exam. Pap collected (co-testing). Contraception: continued combined OCP, tolerating well. ' +
+    'Counseled on cycle regulation and HPV vaccination history. Return for results / routine follow-up.',
   plan: [
     {
       term: 'Abnormal Pap (ASC-US, HPV+)',

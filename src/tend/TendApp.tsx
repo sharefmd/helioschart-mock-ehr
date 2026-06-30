@@ -93,6 +93,7 @@ function PatientHeader() {
 /* ----------------------------------------------------------- Visit page (center note) */
 function VisitPage({ onToast }: { onToast: (m: string) => void }) {
   const [examPE, setExamPE] = useState(false);
+  const [carried, setCarried] = useState(false);
 
   return (
     <div className="t-note" style={{ marginTop: 4 }}>
@@ -139,7 +140,19 @@ function VisitPage({ onToast }: { onToast: (m: string) => void }) {
       </div>
 
       <div className="t-sec">
-        <div className="t-sec-h">{NOTE.planTitle}</div>
+        <div className="t-sec-h" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span>{NOTE.planTitle}</span>
+          {!carried && <button className="t-inline-action" onClick={() => setCarried(true)}>Carry forward previous A&amp;P</button>}
+        </div>
+        {carried && (
+          <div className="t-think-item" style={{ borderStyle: 'dashed', marginBottom: 8 }}>
+            <div className="t-think-guide" style={{ marginTop: 0 }}>
+              <span className="lab">Carried forward · {NOTE.previousAnpDate}</span>
+              <button className="t-inline-action" style={{ marginLeft: 'auto' }} onClick={() => setCarried(false)}>remove</button>
+            </div>
+            <div className="t-think-body" style={{ marginTop: 7 }}>{NOTE.previousAnp}</div>
+          </div>
+        )}
         <div className="t-think">
           {NOTE.plan.map((p) => (
             <div className="t-think-item" key={p.term}>
@@ -149,15 +162,6 @@ function VisitPage({ onToast }: { onToast: (m: string) => void }) {
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="t-sec">
-        <div className="t-sec-h">Current medications</div>
-        <ul className="t-plan">
-          {NOTE.medications.map((m) => (
-            <li className="t-med" key={m.name}><span className="mn">{m.name}</span> <span className="md">{m.detail}</span></li>
-          ))}
-        </ul>
       </div>
 
       <div style={{ marginTop: 18 }}>
