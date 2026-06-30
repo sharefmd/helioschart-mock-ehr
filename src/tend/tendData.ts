@@ -30,20 +30,31 @@ export interface PlanItem { term: string; text: string; note?: string }
 export const NOTE = {
   title: 'Office visit',
   byline: 'Dr. Alanna Reyes · Jun 25, 2026',
+  id: VISIT_SUMMARY,
   interval:
     'Returns for abnormal Pap follow-up. ASC-US with positive high-risk HPV. Reports mild breakthrough spotting ' +
     'on her current pill; otherwise well. No pelvic pain.',
-  exam: 'Focused exam performed today; pertinent findings reflected below.',
+  exam: 'To be documented during the visit.',
   planTitle: 'What to think through today',
   plan: [
     {
       term: 'Abnormal Pap (ASC-US, HPV+)',
-      text: '— Colposcopy vs. repeat cytology? Risk-based guidance leans toward colposcopy; worth deciding today.',
+      text: 'Colposcopy vs. repeat cytology? Risk-based guidance leans toward colposcopy — worth deciding today.',
       note: 'ASCCP: ASC-US with positive high-risk HPV generally meets the threshold for colposcopy.',
     },
-    { term: 'Contraception', text: '— Refill is due and she reports some spotting. Continue the current OCP, or adjust?' },
-    { term: 'Simple ovarian cyst', text: '— Small and simple; surveillance ultrasound is the usual next step.' },
+    { term: 'Contraception', text: 'Refill is due and she reports some spotting. Continue the current OCP, or adjust?' },
+    { term: 'Simple ovarian cyst', text: 'Small and simple — surveillance ultrasound is the usual next step.' },
   ] as PlanItem[],
+  normalPE:
+    'Gen: well-appearing, no acute distress. Abdomen: soft, non-tender, no masses. ' +
+    'Pelvic: external genitalia normal; cervix visualized without gross lesion; uterus normal size and mobile; ' +
+    'no adnexal mass or tenderness.',
+  labsSource: 'Quest Diagnostics',
+  labs: [
+    { name: 'Cervical cytology (Pap)', value: 'ASC-US', abnormal: true, date: 'Jun 10, 2026' },
+    { name: 'HPV, high-risk', value: 'Positive', abnormal: true, date: 'Jun 10, 2026' },
+    { name: 'HPV 16 / 18 genotype', value: 'Not detected', abnormal: false, date: 'Jun 10, 2026' },
+  ],
   medications: [
     { name: 'Combined OCP (norethindrone/EE) 1 mg / 20 mcg', detail: '1 tablet PO daily · for Contraception' },
   ],

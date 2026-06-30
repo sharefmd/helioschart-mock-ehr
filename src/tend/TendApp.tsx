@@ -1,14 +1,14 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Sparkles, Search, Home, Inbox, ChevronDown, ChevronLeft, ChevronsUpDown,
+  Sparkles, Search, Home, Inbox, ChevronLeft, ChevronsUpDown,
   Check, PenLine, LayoutGrid, FolderClosed, Pill, Plus, CornerDownRight,
-  Stethoscope, Scan, CalendarClock, X,
+  Stethoscope, Scan, CalendarClock, X, RefreshCw,
 } from 'lucide-react';
 import './tend.css';
 import {
-  TEND_PROVIDER, RENATA, VISIT_REASONS, VISIT_TYPES, VISIT_SUMMARY, NOTE,
-  PHARMACIES, MED_SEED, ORDER_SEED, FOLLOWUP_SEED, type OrderAction,
+  TEND_PROVIDER, RENATA, NOTE, PHARMACIES, MED_SEED, ORDER_SEED, FOLLOWUP_SEED,
+  type OrderAction,
 } from './tendData';
 
 type Tab = 'overview' | 'visit' | 'chart';
@@ -85,89 +85,87 @@ function PatientHeader() {
     <div className="t-pthead">
       <button className="t-back" onClick={() => nav('/schedule')}><ChevronLeft size={18} /></button>
       <span className="t-ptname">{RENATA.name}</span>
-      <span className="t-ptmeta">{RENATA.age} · {RENATA.sex} · {RENATA.problems}</span>
-      <div className="t-tags">{RENATA.tags.map((t) => <span key={t} className="t-tag">{t}</span>)}</div>
+      <span className="t-ptmeta">{RENATA.age} · {RENATA.sex}</span>
     </div>
   );
 }
 
-/* ----------------------------------------------------------- Editable chip */
-function Chip({ value, options, onChange }: { value: string; options: string[]; onChange: (v: string) => void }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener('mousedown', h);
-    return () => document.removeEventListener('mousedown', h);
-  }, []);
-  return (
-    <span className="t-chip" ref={ref} onClick={() => setOpen((o) => !o)}>
-      {value} <ChevronDown size={14} />
-      {open && (
-        <span className="t-menu" onClick={(e) => e.stopPropagation()}>
-          {options.map((o) => (
-            <span key={o} className={`t-menu-item ${o === value ? 'sel' : ''}`}
-              onClick={() => { onChange(o); setOpen(false); }}>{o}</span>
-          ))}
-        </span>
-      )}
-    </span>
-  );
-}
-
-/* ----------------------------------------------------------- Visit page (center) */
+/* ----------------------------------------------------------- Visit page (center note) */
 function VisitPage({ onToast }: { onToast: (m: string) => void }) {
-  const [reason, setReason] = useState(VISIT_REASONS[0]);
-  const [vtype, setVtype] = useState(VISIT_TYPES[0]);
+  const [examPE, setExamPE] = useState(false);
+
   return (
-    <>
-      <div className="t-prep-label"><Sparkles size={13} /> Visit prep</div>
-      <p className="t-prep-sentence">
-        {RENATA.name.split(' ')[0]} is here for <Chip value={reason} options={VISIT_REASONS} onChange={setReason} />
-        {' '}— charting it as a <Chip value={vtype} options={VISIT_TYPES} onChange={setVtype} /> visit.
-      </p>
-      <p className="t-prep-summary">{VISIT_SUMMARY}</p>
+    <div className="t-note" style={{ marginTop: 4 }}>
+      <div className="t-note-head">
+        <span className="t-note-title">{NOTE.title}</span>
+        <span className="t-ready"><Sparkles size={12} /> Draft</span>
+      </div>
+      <div className="t-note-byline">{NOTE.byline}</div>
 
-      <div className="t-note">
-        <div className="t-note-head">
-          <span className="t-note-title">{vtype}</span>
-          <span className="t-ready"><Sparkles size={12} /> Draft</span>
+      <div className="t-sec"><p><span className="t-idlabel">ID:</span> {NOTE.id}</p></div>
+
+      <div className="t-sec"><div className="t-sec-h">Interval</div><p className="t-sec-p">{NOTE.interval}</p></div>
+
+      <div className="t-sec">
+        <div className="t-sec-h">Objective</div>
+
+        <div className="t-sub">
+          <div className="t-sub-h">Exam</div>
+          {examPE ? (
+            <p className="t-sec-p">{NOTE.normalPE} <button className="t-inline-action" onClick={() => setExamPE(false)}>clear</button></p>
+          ) : (
+            <div className="t-placeholder" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+              <span>To be documented during the visit</span>
+              <button className="t-inline-action" onClick={() => setExamPE(true)}>Insert normal PE</button>
+            </div>
+          )}
         </div>
-        <div className="t-note-byline">{NOTE.byline}</div>
 
-        <div className="t-sec"><div className="t-sec-h">Interval</div><p className="t-sec-p">{NOTE.interval}</p></div>
-        <div className="t-sec"><div className="t-sec-h">Exam</div><p className="t-sec-p">{NOTE.exam}</p></div>
-
-        <div className="t-sec">
-          <div className="t-sec-h">{NOTE.planTitle}</div>
-          <ul className="t-plan">
-            {NOTE.plan.map((p) => (
-              <li className="t-plan-item" key={p.term}>
-                <span className="t-term">{p.term}</span> <span>{p.text}</span>
-                {p.note && <div className="t-callout">{p.note}</div>}
-              </li>
+        <div className="t-sub">
+          <div className="t-sub-h">
+            Labs
+            <span className="t-synced"><RefreshCw size={11} /> Synced from {NOTE.labsSource}</span>
+          </div>
+          <div className="t-labs">
+            {NOTE.labs.map((l) => (
+              <div className="t-lab-row" key={l.name}>
+                <span className="t-lab-name">{l.name}</span>
+                <span className={`t-lab-val ${l.abnormal ? 'abn' : ''}`}>{l.value}</span>
+                <span className="t-lab-date">{l.date}</span>
+              </div>
             ))}
-          </ul>
-        </div>
-
-        <div className="t-sec">
-          <div className="t-sec-h">Current medications</div>
-          <ul className="t-plan">
-            {NOTE.medications.map((m) => (
-              <li className="t-med" key={m.name}>
-                <span className="mn">{m.name}</span> <span className="md">{m.detail}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div style={{ marginTop: 18 }}>
-          <button className="t-chip" style={{ borderBottom: 'none' }} onClick={() => onToast('Editing the note — not wired in this demo.')}>
-            <PenLine size={14} /> Edit note
-          </button>
+          </div>
         </div>
       </div>
-    </>
+
+      <div className="t-sec">
+        <div className="t-sec-h">{NOTE.planTitle}</div>
+        <div className="t-think">
+          {NOTE.plan.map((p) => (
+            <div className="t-think-item" key={p.term}>
+              <div className="t-think-top">{p.term}</div>
+              <div className="t-think-body">{p.text}</div>
+              {p.note && <div className="t-think-guide"><span className="lab">Guideline</span><span>{p.note}</span></div>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="t-sec">
+        <div className="t-sec-h">Current medications</div>
+        <ul className="t-plan">
+          {NOTE.medications.map((m) => (
+            <li className="t-med" key={m.name}><span className="mn">{m.name}</span> <span className="md">{m.detail}</span></li>
+          ))}
+        </ul>
+      </div>
+
+      <div style={{ marginTop: 18 }}>
+        <button className="t-chip" style={{ borderBottom: 'none' }} onClick={() => onToast('Editing the note — not wired in this demo.')}>
+          <PenLine size={14} /> Edit note
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -182,7 +180,6 @@ function Trace({ done, children }: { done?: boolean; children: React.ReactNode }
 
 /* ----------------------------------------------------------- Right automation workspace */
 function ReadyToSign({ onToast }: { onToast: (m: string) => void }) {
-  // medication state — the deep, editable part
   const [medIncluded, setMedIncluded] = useState(true);
   const [medMode, setMedMode] = useState<'refill' | 'discontinue'>('refill');
   const [refills, setRefills] = useState(MED_SEED.refills);
@@ -192,7 +189,6 @@ function ReadyToSign({ onToast }: { onToast: (m: string) => void }) {
   const [draftName, setDraftName] = useState('');
   const [draftSig, setDraftSig] = useState('1 tab PO daily');
 
-  // orders + follow-up
   const [orders, setOrders] = useState<OrderAction[]>(ORDER_SEED);
   const [followup, setFollowup] = useState({ ...FOLLOWUP_SEED });
   const [signed, setSigned] = useState(false);
@@ -208,35 +204,31 @@ function ReadyToSign({ onToast }: { onToast: (m: string) => void }) {
     setDraftName(''); setDraftSig('1 tab PO daily'); setAdding(false);
   };
 
+  const ph = pharmacy.split(' —')[0];
   const medTrace = medMode === 'refill'
-    ? { pending: `Will e-prescribe — refill ×${refills} → ${pharmacy.split(' —')[0]}`, done: `e-Rx sent — refill ×${refills} → ${pharmacy.split(' —')[0]}` }
-    : { pending: `Will discontinue ${MED_SEED.name.split(' (')[0]}`, done: `Discontinued — removed from active medications` };
+    ? { pending: `Will e-prescribe — refill ×${refills} → ${ph}`, done: `e-Rx sent — refill ×${refills} → ${ph}` }
+    : { pending: `Will discontinue ${MED_SEED.name.split(' (')[0]}`, done: 'Discontinued — removed from active medications' };
 
   return (
     <aside className="t-right">
-      <div className="t-right-top">{RENATA.lastSeen}</div>
       <div className="t-right-body">
         <div className="t-right-head"><Sparkles size={18} color="#6d3bec" /> Ready to sign</div>
         <p className="t-right-intro">
           I've drafted the close-out for this visit. Review or adjust each action — I'll carry it out and leave a trace.
         </p>
 
-        {/* MEDICATIONS — the deep, editable area */}
         <div className="t-ws-group">Medications</div>
-
         <div className={`t-acard ${medIncluded ? '' : 'excluded'}`}>
           <div className="t-acard-body">
             <button className={`t-toggle ${medIncluded ? 'on' : ''}`} onClick={() => setMedIncluded((v) => !v)}><Check size={13} /></button>
             <div style={{ flex: 1 }}>
               <div className="t-acard-h"><span className="ic"><Pill size={16} /></span><span className="ttl">{MED_SEED.name}</span></div>
               <div className="t-acard-sub">Current sig: {MED_SEED.sig}</div>
-
               <div className="t-med-row">
                 <div className="t-seg">
                   <button className={medMode === 'refill' ? 'on' : ''} onClick={() => setMedMode('refill')}>Refill</button>
-                  <button className={`${medMode === 'discontinue' ? 'on danger' : ''}`} onClick={() => setMedMode('discontinue')}>Discontinue</button>
+                  <button className={medMode === 'discontinue' ? 'on danger' : ''} onClick={() => setMedMode('discontinue')}>Discontinue</button>
                 </div>
-
                 {medMode === 'refill' && (
                   <div className="t-fieldrow">
                     <div className="t-field">
@@ -257,7 +249,6 @@ function ReadyToSign({ onToast }: { onToast: (m: string) => void }) {
           </div>
         </div>
 
-        {/* newly added meds */}
         {newMeds.map((m) => (
           <div className="t-acard" key={m.id}>
             <div className="t-acard-body">
@@ -284,7 +275,7 @@ function ReadyToSign({ onToast }: { onToast: (m: string) => void }) {
               <label>Sig</label>
               <input className="t-select" value={draftSig} onChange={(e) => setDraftSig(e.target.value)} style={{ width: '100%' }} />
             </div>
-            <div className="row" style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 14 }}>
               <button className="t-addmed" onClick={addMed}><Plus size={14} /> Add to Rx</button>
               <button className="t-addmed" style={{ color: 'var(--ink-3)' }} onClick={() => setAdding(false)}>Cancel</button>
             </div>
@@ -293,7 +284,6 @@ function ReadyToSign({ onToast }: { onToast: (m: string) => void }) {
           <button className="t-addmed" onClick={() => setAdding(true)}><Plus size={15} /> Add medication</button>
         )}
 
-        {/* ORDERS */}
         <div className="t-ws-group">Orders</div>
         {orders.map((o) => (
           <div className={`t-acard ${o.included ? '' : 'excluded'}`} key={o.id}>
@@ -308,7 +298,6 @@ function ReadyToSign({ onToast }: { onToast: (m: string) => void }) {
           </div>
         ))}
 
-        {/* FOLLOW-UP */}
         <div className="t-ws-group">Follow-up</div>
         <div className={`t-acard ${followup.included ? '' : 'excluded'}`}>
           <div className="t-acard-body">
