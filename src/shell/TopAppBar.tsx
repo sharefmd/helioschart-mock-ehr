@@ -60,13 +60,9 @@ export default function TopAppBar() {
 
       <span className="grow" />
 
-      <span
-        className="mode-toggle"
-        title="Intelligent HxR mode — coming soon"
-        onClick={() => toast('Intelligent HxR mode is coming in a future build.', 'info')}
-      >
-        <span className="seg on">Conventional EHR</span>
-        <span className="seg">Intelligent HxR</span>
+      <span className="mode-toggle" title="Switch EHR mode">
+        <span className="seg on" onClick={() => nav('/schedule')}>Conventional EHR</span>
+        <span className="seg" onClick={() => { toast('Switching to Intelligent HxR…', 'info'); nav('/tend'); }}>Intelligent HxR</span>
       </span>
 
       <span className="ico" title="Help" onClick={() => toast('Help center is not available in this demo.', 'info')}>

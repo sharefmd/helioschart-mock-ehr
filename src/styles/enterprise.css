@@ -408,10 +408,12 @@ hr { border: none; border-top: 1px solid var(--border-light); margin: 6px 0; }
 .topbar .ico:hover { color: #fff; }
 .mode-toggle {
   display: inline-flex; border: 1px solid #1c2c3a; border-radius: 3px; overflow: hidden;
-  font-size: var(--fs-xs); opacity: 0.85; cursor: not-allowed;
+  font-size: var(--fs-xs);
 }
-.mode-toggle .seg { padding: 2px 8px; background: #4a4e52; color: #c8cacc; }
+.mode-toggle .seg { padding: 2px 8px; background: #4a4e52; color: #c8cacc; cursor: pointer; }
+.mode-toggle .seg:hover { background: #5a5e63; color: #fff; }
 .mode-toggle .seg.on { background: #d5d6d8; color: #2a2d30; font-weight: bold; }
+.mode-toggle .seg.on:hover { background: #e2e3e5; color: #2a2d30; }
 
 /* ---------- Desktop menu bar (File/Edit/…) ---------- */
 .menubar {

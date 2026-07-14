@@ -1,0 +1,61 @@
+// Specialty-aware note-template definitions for the Tend template builder.
+
+export type Kind = 'free-form' | 'structured' | 'form' | 'mixed';
+export type LabelValue = { label: string; value: string };
+export type Grid = { cols: string[]; rows: { label: string; values: string[] }[] };
+export type Sample = string | string[] | LabelValue[] | Grid;
+export interface Section { id: string; title: string; kind: Kind; why: string; sample: Sample; optional?: boolean }
+
+export const KIND_META: Record<Kind, { label: string; desc: string }> = {
+  'free-form': { label: 'Free-form', desc: 'flowing prose' },
+  structured: { label: 'Structured', desc: 'scannable list' },
+  form: { label: 'Form', desc: 'fixed label/value pairs' },
+  mixed: { label: 'Mixed', desc: 'problem-based label/value pairs' },
+};
+
+export const autoNormalEligible = (id: string) => id === 'mse' || id === 'pe' || id.startsWith('ros-');
+
+/* shared section definitions */
+const idcc: Section = { id: 'id-cc', title: 'ID / Chief Complaint', kind: 'free-form', why: 'A single framing sentence orients the reader fastest as prose.', sample: '34 y/o F with recurrent MDD, here for medication follow-up and 2 weeks of worsening sleep.' };
+const hpi: Section = { id: 'hpi', title: 'HPI', kind: 'free-form', why: 'Narrative captures the story and clinical reasoning a list would fragment.', sample: 'Two weeks of low mood, anhedonia, and early-morning awakening after a job change. Sertraline 100 mg has helped anxiety, but sleep remains poor. Denies SI/HI. No manic symptoms.' };
+const hpiProblem: Section = { id: 'hpi-problem', title: 'HPI — Problem-based', kind: 'mixed', why: 'Problem-based label/value keeps each active issue scannable while preserving nuance.', sample: [{ label: 'Depression', value: '2 wks worsening mood/anhedonia; PHQ-9 15; no SI.' }, { label: 'Insomnia', value: 'Early-morning awakening; sleep hygiene reviewed.' }] };
+const hpiFixed: Section = { id: 'hpi-fixed', title: 'HPI — Fixed problem-based', kind: 'mixed', why: 'A fixed problem set enforces consistent structure visit-over-visit.', sample: [{ label: 'Mood', value: 'Low, reactive.' }, { label: 'Sleep', value: 'Initial + terminal insomnia.' }, { label: 'Safety', value: 'No SI/HI.' }] };
+const meds: Section = { id: 'meds', title: 'Current Medications', kind: 'structured', why: 'A scannable list makes dose, route, and frequency easy to verify.', sample: ['Sertraline — 100 mg PO daily', 'Trazodone — 50 mg PO qHS PRN', 'Melatonin — 3 mg PO qHS'] };
+const allergies: Section = { id: 'allergies', title: 'Allergies', kind: 'structured', why: 'Allergies must be instantly scannable for safety.', sample: ['Penicillin — rash', 'Sulfa — hives', 'NKDA to foods'] };
+const pmh: Section = { id: 'pmh', title: 'Medical History', kind: 'structured', why: 'A list keeps the problem inventory quick to scan.', sample: ['Hypothyroidism', 'Migraine', 'Iron-deficiency anemia'] };
+const psychHx: Section = { id: 'psych-hx', title: 'Psychiatric History', kind: 'structured', why: 'Diagnoses, hospitalizations, and prior trials read best as a list.', sample: ['MDD — dx 2019', '1 prior hospitalization (2020)', 'Trials: fluoxetine, bupropion'] };
+const familyHx: Section = { id: 'family-hx', title: 'Family History', kind: 'mixed', why: 'Grouping by relative keeps hereditary risk clear.', sample: [{ label: 'Mother', value: 'MDD, hypothyroidism' }, { label: 'Father', value: 'Alcohol use disorder' }, { label: 'Sibling', value: 'Bipolar II' }] };
+const socialAdult: Section = { id: 'social-hx', title: 'Social History', kind: 'form', why: 'Fixed categories ensure tobacco, alcohol, and safety are never missed.', sample: [{ label: 'Tobacco', value: 'Never' }, { label: 'Alcohol', value: '2–3 drinks/week' }, { label: 'Living', value: 'Lives with partner' }, { label: 'Employment', value: 'Software; recent change' }] };
+const rosPsych: Section = { id: 'ros-psych', title: 'Review of Systems (Psychiatric)', kind: 'form', why: 'A fixed symptom-domain form drives a complete, comparable review.', sample: [{ label: 'Mood', value: 'Depressed' }, { label: 'Anxiety', value: 'Present' }, { label: 'Psychosis', value: 'Denied' }, { label: 'Sleep', value: 'Impaired' }, { label: 'Appetite', value: 'Reduced' }] };
+const mse: Section = { id: 'mse', title: 'Mental Status Exam', kind: 'form', why: 'The MSE is a fixed exam grid — form filling keeps it standardized.', sample: [{ label: 'Appearance', value: 'Well-groomed' }, { label: 'Behavior', value: 'Cooperative' }, { label: 'Speech', value: 'Normal rate/tone' }, { label: 'Mood / Affect', value: '“Down” / constricted' }, { label: 'Thought', value: 'Linear; no SI/HI' }, { label: 'Cognition', value: 'Grossly intact' }, { label: 'Insight / Judgment', value: 'Fair' }] };
+const labs: Section = { id: 'labs', title: 'Labs', kind: 'structured', why: 'Trending values line up cleanly in a date-grouped grid.', sample: { cols: ['Mar 3', 'Jun 12'], rows: [{ label: 'TSH', values: ['2.1', '2.4'] }, { label: 'Hgb', values: ['11.8', '12.2'] }, { label: 'Na', values: ['139', '140'] }] } };
+const ratingScales: Section = { id: 'rating-scales', title: 'Rating Scales', kind: 'structured', why: 'Scores are only meaningful trended over time — a dated grid shows change.', sample: { cols: ['Mar 3', 'Jun 12'], rows: [{ label: 'PHQ-9', values: ['18', '15'] }, { label: 'GAD-7', values: ['12', '9'] }] } };
+const anp: Section = { id: 'anp', title: 'Assessment & Plan', kind: 'free-form', why: 'Assessment reasoning flows as prose; the plan follows as a numbered list.', sample: 'MDD, moderate — partial response to sertraline; insomnia likely secondary.\n\n1. Increase sertraline to 150 mg daily.\n2. Continue trazodone PRN; reinforce sleep hygiene.\n3. Repeat PHQ-9 in 4 weeks; return in 4 weeks.' };
+const psychotherapy: Section = { id: 'psychotherapy', title: 'Psychotherapy Add-on', kind: 'free-form', optional: true, why: 'Therapy narrative and interventions read naturally as prose.', sample: '45-minute individual psychotherapy (CBT). Addressed cognitive distortions around job loss; assigned a thought record. Alliance strong; patient engaged.' };
+
+const rosFull: Section = { id: 'ros-full', title: 'Review of Systems', kind: 'form', why: 'A full-body ROS as a form ensures every system is reviewed.', sample: [{ label: 'Constitutional', value: 'No fever / weight loss' }, { label: 'Cardiovascular', value: 'No chest pain' }, { label: 'Respiratory', value: 'No dyspnea' }, { label: 'GI', value: 'No nausea / pain' }, { label: 'GU', value: 'No dysuria' }, { label: 'Neuro', value: 'No focal deficits' }] };
+const pe: Section = { id: 'pe', title: 'Physical Exam', kind: 'form', why: 'The exam is a fixed set of systems — a form keeps it consistent and complete.', sample: [{ label: 'General', value: 'NAD, well-appearing' }, { label: 'HEENT', value: 'Normocephalic, atraumatic' }, { label: 'Cardiovascular', value: 'RRR, no murmur' }, { label: 'Lungs', value: 'CTA bilaterally' }, { label: 'Abdomen', value: 'Soft, non-tender' }, { label: 'Extremities', value: 'No edema' }] };
+const surgicalHx: Section = { id: 'surgical-hx', title: 'Surgical History', kind: 'structured', why: 'Prior operations read best as a dated list.', sample: ['Appendectomy — 2011', 'Cholecystectomy — 2019', 'C-section — 2016'] };
+
+const cardiacHx: Section = { id: 'cardiac-hx', title: 'Cardiac History', kind: 'mixed', why: 'Cardiac problems are clearer grouped by condition.', sample: [{ label: 'CAD', value: 'PCI to LAD 2021; on DAPT' }, { label: 'HFrEF', value: 'EF 35%; NYHA II' }, { label: 'AFib', value: 'Rate-controlled; on apixaban' }] };
+const rosCardiac: Section = { id: 'ros-cardiac', title: 'Review of Systems (Cardiac-focused)', kind: 'form', why: 'A focused cardiac ROS as a form drives targeted, complete review.', sample: [{ label: 'Chest pain', value: 'Exertional; resolves with rest' }, { label: 'Dyspnea', value: '2-flight limitation' }, { label: 'Orthopnea', value: '2 pillows' }, { label: 'Palpitations', value: 'Occasional' }, { label: 'Edema', value: 'Trace ankle' }] };
+const peCardiac: Section = { id: 'pe', title: 'Physical Exam (Cardiac-focused)', kind: 'form', why: 'A cardiac-focused exam grid standardizes the findings that matter.', sample: [{ label: 'Vitals', value: 'BP 138/84, HR 72' }, { label: 'JVP', value: '~8 cm' }, { label: 'Heart', value: 'RRR, S4, no murmur' }, { label: 'Lungs', value: 'Bibasilar crackles' }, { label: 'Extremities', value: 'Trace edema' }] };
+const labsCardiac: Section = { id: 'labs', title: 'Labs & Cardiac Studies', kind: 'structured', why: 'Biomarkers and study results trend cleanly in a dated grid.', sample: { cols: ['Apr 2', 'Jul 10'], rows: [{ label: 'BNP', values: ['420', '310'] }, { label: 'Troponin', values: ['<0.01', '<0.01'] }, { label: 'LDL', values: ['96', '78'] }, { label: 'EF (Echo)', values: ['35%', '—'] }] } };
+
+const birthHx: Section = { id: 'birth-hx', title: 'Birth History', kind: 'mixed', why: 'Birth details are clearest grouped by domain.', sample: [{ label: 'Gestation', value: '39 weeks, SVD' }, { label: 'Birth weight', value: '3.4 kg' }, { label: 'Complications', value: 'None' }, { label: 'Nursery', value: 'Routine; home day 2' }] };
+const devHx: Section = { id: 'dev-hx', title: 'Developmental History', kind: 'structured', why: 'Milestones scan quickly as a list.', sample: ['Smiled — 6 wks', 'Sat unsupported — 6 mo', 'Walked — 13 mo', 'First words — 11 mo'] };
+const immunizations: Section = { id: 'immunizations', title: 'Immunizations', kind: 'structured', why: 'Vaccine status reads best at a glance as a list.', sample: ['DTaP — up to date', 'MMR — 1 of 2', 'Varicella — up to date', 'Influenza — 2025–26 given'] };
+const socialPeds: Section = { id: 'social-hx', title: 'Social History', kind: 'form', why: 'Peds social history has fixed categories (home, childcare, safety).', sample: [{ label: 'Household', value: 'Both parents + 1 sibling' }, { label: 'Childcare', value: 'Daycare 3 days/week' }, { label: 'Safety', value: 'Car seat; smoke detectors' }, { label: 'Screen time', value: '~1 hr/day' }] };
+const pePeds: Section = { id: 'pe', title: 'Pediatric Physical Exam', kind: 'form', why: 'A fixed pediatric exam grid keeps every system covered.', sample: [{ label: 'General', value: 'Well-appearing, playful' }, { label: 'HEENT', value: 'TMs clear' }, { label: 'Cardiovascular', value: 'RRR, no murmur' }, { label: 'Lungs', value: 'CTA' }, { label: 'Abdomen', value: 'Soft, non-tender' }, { label: 'Skin', value: 'No rashes' }] };
+const growth: Section = { id: 'growth', title: 'Growth Chart', kind: 'structured', why: 'Percentiles only mean something trended — a dated grid shows the trajectory.', sample: { cols: ['12 mo', '18 mo', '24 mo'], rows: [{ label: 'Weight %ile', values: ['50', '55', '60'] }, { label: 'Height %ile', values: ['45', '50', '52'] }, { label: 'Head circ %ile', values: ['60', '—', '—'] }] } };
+
+export const SPECIALTY_ORDER = ['Psychiatry', 'Family Medicine', 'Surgery', 'Cardiology', 'Pediatrics'] as const;
+export type Specialty = typeof SPECIALTY_ORDER[number];
+
+export const SPECIALTIES: Record<Specialty, { tagline: string; sections: Section[] }> = {
+  Psychiatry: { tagline: 'Mental status, rating scales, and problem-based HPI.', sections: [idcc, hpi, hpiProblem, hpiFixed, meds, allergies, pmh, psychHx, familyHx, socialAdult, rosPsych, mse, labs, ratingScales, anp, psychotherapy] },
+  'Family Medicine': { tagline: 'Full ROS and physical exam for whole-person primary care.', sections: [idcc, hpi, hpiProblem, hpiFixed, meds, allergies, pmh, familyHx, socialAdult, rosFull, pe, labs, anp] },
+  Surgery: { tagline: 'Primary-care backbone plus surgical history.', sections: [idcc, hpi, hpiProblem, hpiFixed, meds, allergies, pmh, surgicalHx, familyHx, socialAdult, rosFull, pe, labs, anp] },
+  Cardiology: { tagline: 'Cardiac history, focused ROS/exam, and cardiac studies.', sections: [idcc, hpi, cardiacHx, meds, allergies, pmh, familyHx, socialAdult, rosCardiac, peCardiac, labsCardiac, anp] },
+  Pediatrics: { tagline: 'Birth, development, immunizations, and growth tracking.', sections: [idcc, hpi, birthHx, devHx, immunizations, meds, allergies, pmh, familyHx, socialPeds, rosFull, pePeds, growth, labs, anp] },
+};
