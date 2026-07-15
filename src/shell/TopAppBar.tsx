@@ -62,7 +62,7 @@ export default function TopAppBar() {
 
       <span className="mode-toggle" title="Switch EHR mode">
         <span className="seg on" onClick={() => nav('/schedule')}>Conventional EHR</span>
-        <span className="seg" onClick={() => { toast('Switching to Intelligent HxR…', 'info'); nav('/tend'); }}>Intelligent HxR</span>
+        <span className="seg" onClick={() => { toast('Switching to Freed…', 'info'); nav('/tend/migrate'); }}>Intelligent HxR</span>
       </span>
 
       <span className="ico" title="Help" onClick={() => toast('Help center is not available in this demo.', 'info')}>

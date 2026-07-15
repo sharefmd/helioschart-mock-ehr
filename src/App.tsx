@@ -22,12 +22,14 @@ import {
 } from './modules/chart/MoreTabs';
 import TendApp from './tend/TendApp';
 import TemplateBuilder from './tend/TemplateBuilder';
+import MigrateFlow from './tend/MigrateFlow';
 
 export default function App() {
   return (
     <Routes>
       {/* The new AI-native EHR ("Tend") — its own full-screen surface, no HeliosChart shell */}
       <Route path="/tend" element={<TendApp />} />
+      <Route path="/tend/migrate" element={<MigrateFlow />} />
       <Route path="/tend/templates" element={<TemplateBuilder />} />
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/schedule" replace />} />

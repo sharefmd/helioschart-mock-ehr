@@ -346,6 +346,68 @@
 .tb-note-sec .ns-head { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
 .tb-note-sec .ns-title { font-size: 13.5px; font-weight: 700; }
 
+/* ============================================================
+   MIGRATION / SWITCHOVER WIZARD (/tend/migrate)
+   ============================================================ */
+.mig-root {
+  flex-direction: column; align-items: center; justify-content: flex-start;
+  overflow-y: auto; padding: 40px 20px 60px;
+  background: linear-gradient(180deg, #f6f5f2 0%, #efeafe 55%, #f6f5f2 100%);
+}
+.mig-card {
+  width: 100%; max-width: 720px; background: #fff; border: 1px solid var(--border);
+  border-radius: 20px; padding: 34px; box-shadow: 0 12px 44px rgba(40,30,80,0.08); margin-top: 5vh;
+}
+.mig-kicker { display: inline-flex; align-items: center; gap: 6px; color: var(--violet); font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+.mig-title { font-size: 25px; font-weight: 700; letter-spacing: -0.4px; margin-top: 10px; }
+.mig-sub { color: var(--ink-2); margin-top: 8px; line-height: 1.55; }
+
+/* source -> Freed flow */
+.mig-flow { display: flex; align-items: center; margin: 26px 0 8px; }
+.mig-node { flex-shrink: 0; width: 168px; border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px; text-align: center; background: #fff; }
+.mig-node .nl { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.4px; }
+.mig-node .nn { font-size: 15px; font-weight: 700; margin-top: 4px; }
+.mig-node.freed { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(109,59,236,0.12); }
+.mig-node.freed .nn { color: var(--violet-2); }
+.mig-node .tile { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; margin: 0 auto 8px; }
+.mig-pipe { flex: 1; height: 4px; position: relative; background: #e6e2f4; border-radius: 3px; overflow: hidden; }
+.mig-pipe .flow { position: absolute; top: 0; bottom: 0; width: 38%; background: linear-gradient(90deg, transparent, var(--violet), transparent); animation: migflow 1.05s linear infinite; }
+@keyframes migflow { from { left: -40%; } to { left: 100%; } }
+.mig-streaming { text-align: center; font-size: 12.5px; color: var(--ink-3); min-height: 18px; }
+
+/* overall progress */
+.mig-overall { display: flex; align-items: center; gap: 12px; margin: 18px 0 6px; }
+.mig-overall .bar { flex: 1; height: 8px; background: #eceaf6; border-radius: 4px; overflow: hidden; }
+.mig-overall .bar .fill { height: 100%; background: linear-gradient(90deg, var(--violet), #8f6bf2); border-radius: 4px; transition: width .1s linear; }
+.mig-overall .pct { width: 46px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* category rows */
+.mig-cats { margin-top: 10px; }
+.mig-cat { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+.mig-cat .ic { color: var(--ink-3); display: inline-flex; transition: color .2s; }
+.mig-cat.active .ic { color: var(--violet); }
+.mig-cat.done .ic { color: var(--green-fg); }
+.mig-cat .lbl { width: 150px; font-size: 13.5px; flex-shrink: 0; }
+.mig-cat .cbar { flex: 1; height: 6px; background: #eceaf6; border-radius: 3px; overflow: hidden; }
+.mig-cat .cbar .fill { height: 100%; background: var(--violet); border-radius: 3px; transition: width .12s linear; }
+.mig-cat.done .cbar .fill { background: var(--green-fg); }
+.mig-cat .cnt { width: 92px; text-align: right; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.mig-cat .chk { width: 16px; color: var(--green-fg); display: inline-flex; }
+
+/* done state */
+.mig-done-badge { width: 60px; height: 60px; border-radius: 50%; background: var(--green-bg); color: var(--green-fg); display: grid; place-items: center; margin-bottom: 4px; animation: migpop .4s ease-out; }
+@keyframes migpop { 0% { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+.mig-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+.mig-tile { border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.mig-tile .n { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.mig-tile .l { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+
+.mig-actions { display: flex; align-items: center; gap: 10px; margin-top: 24px; }
+.tend-app .mig-select { border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px; background: #fff; font-size: 14px; color: var(--ink); min-width: 220px; }
+.tend-app .mig-select:focus { outline: none; border-color: var(--violet); }
+.mig-link { color: var(--ink-3); font-size: 13px; }
+.tend-app .mig-link:hover { color: var(--violet-2); }
+
 /* demo ribbon */
 .t-demo { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 40;
   background: rgba(28,28,32,0.85); color: #fff; font-size: 11px; padding: 3px 12px; border-radius: 999px; }
