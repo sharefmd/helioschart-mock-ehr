@@ -411,3 +411,76 @@
 /* demo ribbon */
 .t-demo { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 40;
   background: rgba(28,28,32,0.85); color: #fff; font-size: 11px; padding: 3px 12px; border-radius: 999px; }
+
+/* ============================================================
+   CHART TAB — horizontal category nav
+   ============================================================ */
+.t-chart { max-width: 760px; }
+
+/* horizontal category bar (scrolls if it overflows) */
+.t-catbar {
+  display: flex; gap: 4px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 4px;
+  border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 5;
+}
+.t-catbar::-webkit-scrollbar { height: 0; }
+.tend-app .t-cat {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0;
+  padding: 7px 13px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  color: var(--ink-2); border: 1px solid transparent;
+}
+.tend-app .t-cat:hover { background: #ecebe7; color: var(--ink); }
+.tend-app .t-cat.active { background: var(--violet-soft); color: var(--violet-2); border-color: #ddd2f7; }
+.t-cat-count { font-size: 11px; font-weight: 700; background: rgba(0,0,0,0.06); color: var(--ink-2); border-radius: 999px; padding: 0 6px; min-width: 18px; text-align: center; }
+.t-cat.active .t-cat-count { background: #fff; color: var(--violet-2); }
+
+.t-cat-body { padding-top: 6px; }
+.t-sec-h .t-tagpill { margin-left: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--ink-3); background: #ecebe7; border-radius: 5px; padding: 2px 6px; vertical-align: middle; }
+
+/* visit / note repository */
+.t-vlist { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.t-vrow { display: flex; gap: 14px; padding: 11px 14px; border-bottom: 1px solid var(--border-2); }
+.t-vrow:last-child { border-bottom: none; }
+.t-vrow.current { background: var(--violet-soft); }
+.t-vdate { width: 96px; flex-shrink: 0; color: var(--ink-2); font-size: 12.5px; font-weight: 600; }
+.t-vmain { min-width: 0; }
+.t-vtype { font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 8px; }
+.t-vsum { color: var(--ink); font-size: 13px; margin-top: 1px; }
+.t-vprov { color: var(--ink-3); font-size: 12px; margin-top: 2px; }
+.t-badge-now { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--violet-2); background: #fff; border: 1px solid #ddd2f7; border-radius: 999px; padding: 1px 7px; }
+
+/* documents / outside records */
+.t-doclist { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.t-docrow { display: flex; align-items: flex-start; gap: 11px; padding: 11px 14px; border-bottom: 1px solid var(--border-2); }
+.t-docrow:last-child { border-bottom: none; }
+.t-docic { color: var(--ink-3); margin-top: 1px; flex-shrink: 0; }
+.t-docname { font-weight: 600; font-size: 13.5px; display: flex; align-items: center; gap: 8px; }
+.t-docmeta { color: var(--ink-3); font-size: 12px; margin-top: 2px; }
+.t-badge-out { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--amber-fg); background: var(--amber-bg); border-radius: 999px; padding: 1px 7px; }
+
+/* bulleted list */
+.t-clist { display: flex; flex-direction: column; gap: 3px; }
+.t-clist li { position: relative; padding-left: 15px; color: var(--ink); }
+.t-clist li::before { content: ""; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); }
+
+/* key/value table (obstetric hx, etc.) */
+.t-kv { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; padding: 2px 12px; }
+.t-kv-row { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-2); }
+.t-kv-row:last-child { border-bottom: none; }
+.t-kv-row .k { width: 158px; flex-shrink: 0; color: var(--ink-2); font-weight: 600; font-size: 13px; }
+.t-kv-row .v { color: var(--ink); }
+
+/* medication list */
+.t-mlist { display: flex; flex-direction: column; gap: 6px; }
+
+/* vitals chips */
+.t-vitals { display: flex; flex-wrap: wrap; gap: 8px; }
+.t-vital { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; min-width: 78px; background: #fbfbfa; }
+.t-vital .vl { font-size: 11px; color: var(--ink-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.t-vital .vv { font-size: 15px; font-weight: 700; margin-top: 2px; }
+.t-vital .vv.abn { color: var(--amber-fg); }
+
+/* A&P plan bullets (violet dot) */
+.t-plan-list { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+.t-plan-list li { position: relative; padding-left: 15px; font-size: 13.5px; color: var(--ink); }
+.t-plan-list li::before { content: ""; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--violet); }
+.t-think-body em { font-style: normal; font-weight: 700; color: var(--ink-2); }

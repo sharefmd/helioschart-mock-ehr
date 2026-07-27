@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import {
   Sparkles, ChevronLeft,
   Check, PenLine, LayoutGrid, FolderClosed, Pill, Plus, CornerDownRight,
-  Stethoscope, Scan, CalendarClock, X, RefreshCw,
+  Stethoscope, Scan, CalendarClock, X, RefreshCw, FileText,
 } from 'lucide-react';
 import './tend.css';
 import TendRail from './TendRail';
 import {
-  RENATA, NOTE, PHARMACIES, MED_SEED, ORDER_SEED, FOLLOWUP_SEED,
-  type OrderAction,
+  RENATA, NOTE, PHARMACIES, MED_SEED, ORDER_SEED, FOLLOWUP_SEED, CHART_CATEGORIES,
+  type OrderAction, type ChartSection,
 } from './tendData';
 
 type Tab = 'overview' | 'visit' | 'chart';
@@ -42,7 +42,8 @@ export default function TendApp() {
 
         <div className="t-scroll">
           {tab === 'visit' ? <VisitPage onToast={showToast} />
-            : <div className="t-stub">{tab === 'overview' ? 'Overview' : 'Chart'} — coming soon.</div>}
+            : tab === 'chart' ? <ChartPage />
+            : <div className="t-stub">Overview — coming soon.</div>}
         </div>
       </div>
 
@@ -64,6 +65,145 @@ function PatientHeader() {
       <span className="t-ptmeta">{RENATA.age} · {RENATA.sex}</span>
     </div>
   );
+}
+
+/* ----------------------------------------------------------- Chart page */
+function ChartPage() {
+  const [active, setActive] = useState(CHART_CATEGORIES[0].id);
+  const cat = CHART_CATEGORIES.find((c) => c.id === active) ?? CHART_CATEGORIES[0];
+
+  return (
+    <div className="t-chart">
+      <div className="t-catbar">
+        {CHART_CATEGORIES.map((c) => (
+          <button key={c.id} className={`t-cat ${c.id === active ? 'active' : ''}`} onClick={() => setActive(c.id)}>
+            {c.label}
+            {c.count != null && <span className="t-cat-count">{c.count}</span>}
+          </button>
+        ))}
+      </div>
+
+      <div className="t-cat-body">
+        {cat.sections.map((s) => (
+          <div className="t-sec" key={s.id}>
+            <div className="t-sec-h">
+              {s.title}
+              {s.tag && <span className="t-tagpill">{s.tag}</span>}
+            </div>
+            <SectionBody section={s} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SectionBody({ section }: { section: ChartSection }) {
+  if (section.empty || !section.block) {
+    const reason = section.tag === 'peds' ? 'Pediatric section — not applicable to this patient'
+      : section.tag === 'psych' ? 'Behavioral-health section — not used this encounter'
+      : 'Not documented for this encounter';
+    return <div className="t-placeholder">{reason}</div>;
+  }
+  const b = section.block;
+  switch (b.kind) {
+    case 'text':
+      return <p className="t-sec-p">{b.text}</p>;
+    case 'list':
+      return <ul className="t-clist">{b.items.map((x, i) => <li key={i}>{x}</li>)}</ul>;
+    case 'kv':
+      return (
+        <div className="t-kv">
+          {b.items.map((x, i) => (
+            <div className="t-kv-row" key={i}><span className="k">{x.k}</span><span className="v">{x.v}</span></div>
+          ))}
+        </div>
+      );
+    case 'meds':
+      return (
+        <div className="t-mlist">
+          {b.items.map((m, i) => (
+            <div className="t-med" key={i}>
+              <span className="mn">{m.name}</span> <span className="md">· {m.sig}{m.status ? ` · ${m.status}` : ''}</span>
+            </div>
+          ))}
+        </div>
+      );
+    case 'vitals':
+      return (
+        <div className="t-vitals">
+          {b.items.map((v, i) => (
+            <div className="t-vital" key={i}>
+              <span className="vl">{v.label}</span>
+              <span className={`vv ${v.abnormal ? 'abn' : ''}`}>{v.value}</span>
+            </div>
+          ))}
+        </div>
+      );
+    case 'labs':
+      return (
+        <div className="t-sub" style={{ marginTop: 0 }}>
+          {b.source && (
+            <div className="t-sub-h">
+              <span className="t-synced"><RefreshCw size={11} /> Synced from {b.source}</span>
+            </div>
+          )}
+          <div className="t-labs">
+            {b.items.map((l) => (
+              <div className="t-lab-row" key={l.name}>
+                <span className="t-lab-name">{l.name}</span>
+                <span className={`t-lab-val ${l.abnormal ? 'abn' : ''}`}>{l.value}</span>
+                <span className="t-lab-date">{l.date}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    case 'rads':
+      return (
+        <div className="t-think">
+          {b.items.map((rx, i) => (
+            <div className="t-think-item" key={i}>
+              <div className="t-think-top" style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                <span>{rx.study}</span><span className="t-lab-date">{rx.date}</span>
+              </div>
+              <div className="t-think-body">{rx.impression}</div>
+            </div>
+          ))}
+        </div>
+      );
+    case 'visits':
+      return (
+        <div className="t-vlist">
+          {b.items.map((v, i) => (
+            <div className={`t-vrow ${v.current ? 'current' : ''}`} key={i}>
+              <div className="t-vdate">{v.date}</div>
+              <div className="t-vmain">
+                <div className="t-vtype">{v.type}{v.current && <span className="t-badge-now">Today</span>}</div>
+                <div className="t-vsum">{v.summary}</div>
+                <div className="t-vprov">{v.provider}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    case 'docs':
+      return (
+        <div className="t-doclist">
+          {b.items.map((d, i) => (
+            <div className="t-docrow" key={i}>
+              <FileText size={15} className="t-docic" />
+              <div className="t-docmain">
+                <div className="t-docname">{d.name}{d.outside && <span className="t-badge-out">Outside</span>}</div>
+                <div className="t-docmeta">{d.type} · {d.source} · {d.date}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    default:
+      return null;
+  }
 }
 
 /* ----------------------------------------------------------- Visit page (center note) */
