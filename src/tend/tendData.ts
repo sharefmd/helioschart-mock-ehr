@@ -94,13 +94,14 @@ export const FOLLOWUP_SEED = {
 // Rads · Visits/Notes · Documents.
 // ============================================================
 
+export interface GridCell { v: string; abn?: boolean }
 export type ChartBlock =
   | { kind: 'text'; text: string }
   | { kind: 'list'; items: string[] }
   | { kind: 'kv'; items: { k: string; v: string }[] }
   | { kind: 'meds'; items: { name: string; sig: string; status?: string }[] }
-  | { kind: 'vitals'; items: { label: string; value: string; abnormal?: boolean }[] }
-  | { kind: 'labs'; source?: string; items: { name: string; value: string; date: string; abnormal?: boolean }[] }
+  // time-series table: rows (measures) × columns (dates) — used by Vitals & Labs
+  | { kind: 'grid'; source?: string; dates: string[]; rows: { label: string; cells: GridCell[] }[] }
   | { kind: 'rads'; items: { study: string; date: string; impression: string; abnormal?: boolean }[] }
   | { kind: 'visits'; items: { date: string; type: string; provider: string; summary: string; current?: boolean }[] }
   | { kind: 'docs'; items: { name: string; date: string; source: string; type: string; outside?: boolean }[] };
@@ -192,20 +193,26 @@ export const CHART_CATEGORIES: ChartCategory[] = [
     id: 'objective', label: 'Objective',
     sections: [
       { id: 'vitals', title: 'Vitals',
-        block: { kind: 'vitals', items: [
-          { label: 'BP', value: '118 / 72' },
-          { label: 'HR', value: '68' },
-          { label: 'Temp', value: '98.4 °F' },
-          { label: 'Wt', value: '138 lb' },
-          { label: 'BMI', value: '22.1' },
-          { label: 'SpO₂', value: '99%' },
+        block: { kind: 'grid', dates: ['Jun 25, 2026', 'Jun 25, 2025', 'Nov 12, 2024'], rows: [
+          { label: 'BP (mmHg)', cells: [{ v: '118/72' }, { v: '116/70' }, { v: '120/74' }] },
+          { label: 'HR (bpm)', cells: [{ v: '68' }, { v: '72' }, { v: '70' }] },
+          { label: 'Temp (°F)', cells: [{ v: '98.4' }, { v: '98.2' }, { v: '98.6' }] },
+          { label: 'Resp (/min)', cells: [{ v: '14' }, { v: '14' }, { v: '16' }] },
+          { label: 'Weight', cells: [{ v: '138 lb' }, { v: '140 lb' }, { v: '137 lb' }] },
+          { label: 'BMI', cells: [{ v: '22.1' }, { v: '22.4' }, { v: '21.9' }] },
+          { label: 'SpO₂', cells: [{ v: '99%' }, { v: '99%' }, { v: '98%' }] },
+          { label: 'Pain (0–10)', cells: [{ v: '0' }, { v: '0' }, { v: '2' }] },
         ] } },
       { id: 'labs', title: 'Labs',
-        block: { kind: 'labs', source: 'Quest Diagnostics', items: [
-          { name: 'Cervical cytology (Pap)', value: 'ASC-US', date: 'Jun 10, 2026', abnormal: true },
-          { name: 'HPV, high-risk', value: 'Positive', date: 'Jun 10, 2026', abnormal: true },
-          { name: 'HPV 16 / 18 genotype', value: 'Not detected', date: 'Jun 10, 2026' },
-          { name: 'Hemoglobin', value: '12.8 g/dL', date: 'Jun 10, 2026' },
+        block: { kind: 'grid', source: 'Quest Diagnostics',
+          dates: ['Jun 10, 2026', 'Jun 25, 2025', 'Mar 3, 2023'], rows: [
+          { label: 'Cervical cytology (Pap)', cells: [{ v: 'ASC-US', abn: true }, { v: 'Normal' }, { v: '—' }] },
+          { label: 'HPV, high-risk', cells: [{ v: 'Positive', abn: true }, { v: 'Negative' }, { v: '—' }] },
+          { label: 'HPV 16 / 18 genotype', cells: [{ v: 'Not detected' }, { v: '—' }, { v: '—' }] },
+          { label: 'Hemoglobin (g/dL)', cells: [{ v: '12.8' }, { v: '12.5' }, { v: '10.9', abn: true }] },
+          { label: 'Hematocrit (%)', cells: [{ v: '38.4' }, { v: '38.0' }, { v: '33.1', abn: true }] },
+          { label: 'Ferritin (ng/mL)', cells: [{ v: '—' }, { v: '—' }, { v: '11', abn: true }] },
+          { label: 'TSH (mIU/L)', cells: [{ v: '—' }, { v: '2.1' }, { v: '—' }] },
         ] } },
       { id: 'scales', title: 'Rating Scales', tag: 'psych', empty: true },
     ],
@@ -246,3 +253,91 @@ export const CHART_CATEGORIES: ChartCategory[] = [
     ],
   },
 ];
+
+// ============================================================
+// CHART VIEW MODES — the same complete chart through 3 formats.
+// Categories & Snapshot render straight from CHART_CATEGORIES
+// (single source of truth). By Problem adds a dx-clustered lens
+// on top of the full record.
+// ============================================================
+
+// ---- By Problem: data re-clustered under each active problem ----
+export interface ProblemGroup {
+  name: string; icd?: string; status: string; onset?: string; assessment: string;
+  meds?: string[]; results?: { name: string; value: string; abnormal?: boolean }[]; imaging?: string[]; plan?: string[];
+}
+export const PROBLEMS: ProblemGroup[] = [
+  { name: 'Abnormal cervical cytology (ASC-US, HPV+)', icd: 'R87.610', status: 'Active', onset: '2026',
+    assessment: 'ASC-US with positive high-risk HPV (16/18 not detected). Meets ASCCP threshold for colposcopy.',
+    results: [
+      { name: 'Cervical cytology (Pap)', value: 'ASC-US', abnormal: true },
+      { name: 'HPV, high-risk', value: 'Positive', abnormal: true },
+      { name: 'HPV 16 / 18 genotype', value: 'Not detected' },
+    ],
+    plan: ['Refer for colposcopy (referral placed)', 'Counsel on rationale', 'Review findings at follow-up'] },
+  { name: 'Contraception', icd: 'Z30.9', status: 'Active',
+    assessment: 'Stable on combined OCP with mild breakthrough spotting; no contraindications identified.',
+    meds: ['Combined OCP (norethindrone/EE 1 mg / 20 mcg) — 1 tab PO daily'],
+    plan: ['Continue current OCP', 'Refill ×3 to pharmacy', 'Reassess if spotting persists > 3 months'] },
+  { name: 'Simple ovarian cyst', icd: 'N83.20', status: 'Surveillance',
+    assessment: '3.2 cm simple left ovarian cyst, asymptomatic, benign appearance.',
+    imaging: ['Pelvic ultrasound (Apr 2, 2026): 3.2 cm simple left ovarian cyst'],
+    plan: ['Surveillance pelvic ultrasound in 8–12 weeks', 'No intervention indicated now'] },
+];
+
+// ============================================================
+// AI-NATIVE MINIMALIST VIEWS — lead with cognition, not density.
+// Focus / Ask / Brief. Each still exposes the full record on demand.
+// ============================================================
+
+export const AI_ONELINER =
+  '32-year-old here for abnormal-Pap follow-up — ASC-US with high-risk HPV. Stable on the pill (some breakthrough spotting), and a small simple ovarian cyst that just needs watching.';
+
+// ---- Focus: the one decision + a little context ----
+export const FOCUS = {
+  decision: {
+    title: 'Colposcopy vs. repeat cytology',
+    why: 'ASC-US with positive high-risk HPV (16/18 not detected) meets the ASCCP threshold for colposcopy.',
+    evidence: ['Pap: ASC-US', 'HPV high-risk: Positive', 'HPV 16/18: not detected'],
+  },
+  alsoKnow: [
+    { label: 'Contraception', text: 'Refill due; mild breakthrough spotting on the current pill — no contraindications.' },
+    { label: 'Ovarian cyst', text: '3.2 cm simple left cyst — surveillance ultrasound in 8–12 weeks.' },
+    { label: 'Background', text: 'Never-smoker, HPV-vaccinated; family history of breast & cervical cancer.' },
+  ],
+};
+
+// ---- Ask: conversational Q&A over the chart ----
+export interface AskQA { q: string; a: string; cites?: string[]; }
+export const ASK: AskQA[] = [
+  { q: 'What’s the decision today?',
+    a: 'Whether to proceed to colposcopy or repeat co-testing. Her ASC-US with positive high-risk HPV (16/18 not detected) meets the ASCCP threshold for colposcopy, so colposcopy is favored — a referral is placed but not yet scheduled.',
+    cites: ['Pap: ASC-US', 'HPV high-risk: Positive', 'Referral: Colposcopy'] },
+  { q: 'Is her contraception working?',
+    a: 'She’s been on a combined OCP (norethindrone/EE) for ~3 years with good adherence and no missed pills, now with mild breakthrough spotting over ~2 months and no contraindications. Plan: continue and reassess if spotting persists beyond 3 months.',
+    cites: ['Med: Combined OCP', 'LMP: Jun 2, 2026'] },
+  { q: 'Anything to worry about on imaging?',
+    a: 'A 3.2 cm simple left ovarian cyst was seen on pelvic ultrasound (Apr 2, 2026), benign in appearance; a prior ultrasound (Nov 2024) was normal. Surveillance imaging is the expected next step — no intervention now.',
+    cites: ['Imaging: Pelvic US 3.2 cm cyst'] },
+  { q: 'What’s her cancer-risk background?',
+    a: 'Family history of breast cancer (mother, age 58) and cervical cancer (maternal grandmother). She completed the HPV (Gardasil 9) series in 2012 and is a never-smoker. Worth revisiting screening cadence.',
+    cites: ['Family Hx', 'Immunizations', 'Social Hx'] },
+  { q: 'What medications is she on?',
+    a: 'Combined OCP (norethindrone/EE 1 mg / 20 mcg) 1 tab PO daily and folic acid 400 mcg daily (OTC). Ferrous sulfate was discontinued in 2023 after her iron-deficiency anemia resolved.',
+    cites: ['Medications'] },
+];
+
+// ---- Brief: the 20-second pre-visit read ----
+export const BRIEF = {
+  sinceLast: {
+    date: 'since Jun 25, 2025',
+    items: [
+      'Pap turned abnormal — ASC-US with positive high-risk HPV (normal last year).',
+      'New 3.2 cm simple left ovarian cyst on ultrasound.',
+      'Mild breakthrough spotting on the current pill.',
+    ],
+  },
+  decideToday: ['Colposcopy vs. repeat cytology — ASCCP favors colposcopy.'],
+  pending: ['Colposcopy referral placed — not yet scheduled.', 'Surveillance pelvic ultrasound due ~Sep 2026.'],
+  askHer: ['How bothersome is the spotting?', 'Confirm she understands the colposcopy plan.'],
+};
